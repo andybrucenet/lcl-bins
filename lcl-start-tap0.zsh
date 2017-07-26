@@ -3,8 +3,8 @@
 [[ "$UID" -ne "0" ]] && echo "You must be root. Goodbye..." && exit 1
 echo "starting"
 exec 4<>/dev/tap0
-#ifconfig tap0 10.10.10.1 10.10.10.255
-ifconfig tap0 192.168.98.100/24
+ifconfig tap0 10.10.10.1 10.10.10.255
+#ifconfig tap0 192.168.98.100/24
 ifconfig tap0 up
 ping -c1 10.10.10.1
 echo "ending"

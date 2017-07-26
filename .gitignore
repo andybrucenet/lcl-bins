@@ -1,0 +1,9 @@
+*~
+.git
+.vagrant
+*.pyc
+*.pyo
+.idea
+*.swp
+.DS_Store
+
