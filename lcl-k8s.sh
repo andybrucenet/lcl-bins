@@ -2,9 +2,22 @@
 # lcl-k8s.sh, ABr
 # Up/Down
 
+# How to use:
+# 1. Set variables for K8s version and location
+# 2. To start:
+#      lcl-k8s.sh start
+# 3. To stop:
+#      lcl-k8s.sh stop
+#
+# "Start" brings up everything, including all post-Kubernetes
+# deployments (such as DNS and Dashboard).
+#
+# "Stop" brings down everything - do *not* count on any K8s
+# state being preserved.
+
 # get vars we need (permit overrides)
 g_DOCKER_KUBE_FOR_MAC_K8S_VERSION=${DOCKER_KUBE_FOR_MAC_K8S_VERSION:-1.7.3}
-g_DOCKER_KUBE_FOR_MAC_LOCATION=${DOCKER_KUBE_FOR_MAC_LOCATION:-${HOME}/proj/git/src/lmgitlab.hlsdev.local/hlsdev/docker-images/kube-for-mac}
+g_DOCKER_KUBE_FOR_MAC_LOCATION=${DOCKER_KUBE_FOR_MAC_LOCATION:-$(realpath .)}
 g_DOCKER_KUBE_FOR_MAC_CONTEXT=${DOCKER_KUBE_FOR_MAC_CONTEXT:-kube-for-mac}
 #g_DOCKER_KUBE_FOR_MAC_GLOBAL_PV_NAME=${DOCKER_KUBE_FOR_MAC_GLOBAL_PV_NAME:-global-pv}
 #g_DOCKER_KUBE_FOR_MAC_GLOBAL_PV_LOCATION=${DOCKER_KUBE_FOR_MAC_GLOBAL_PV_LOCATION:-${HOME}/proj/work/local-k8s-global-pv}
@@ -29,7 +42,7 @@ function lcl-k8s-i-deploy {
   if [ x"$l_deploy_line" = x ] ; then
     echo ''
     echo ''
-    "$g_DOCKER_KUBE_FOR_MAC_LOCATION"/hacks/v${g_DOCKER_KUBE_FOR_MAC_K8S_VERSION}/run lm-docker-kube-for-mac.sh custom source /etc/hacks-in/hacks.sh DEPLOY-$i_custom_name
+    "$g_DOCKER_KUBE_FOR_MAC_LOCATION"/hacks/v${g_DOCKER_KUBE_FOR_MAC_K8S_VERSION}/run docker-kube-for-mac.sh custom source /etc/hacks-in/hacks.sh DEPLOY-$i_custom_name
   fi
   l_deploy_ready=0
   l_rc=0
@@ -52,7 +65,7 @@ function lcl-k8s-i-deploy {
 # start all - assumes from zero
 function lcl-k8s-x-start {
   # start the cluster
-  "$g_DOCKER_KUBE_FOR_MAC_LOCATION"/hacks/v${g_DOCKER_KUBE_FOR_MAC_K8S_VERSION}/run lm-docker-kube-for-mac.sh start
+  "$g_DOCKER_KUBE_FOR_MAC_LOCATION"/hacks/v${g_DOCKER_KUBE_FOR_MAC_K8S_VERSION}/run docker-kube-for-mac.sh start
 
   # locals
   local l_ready=0
@@ -154,7 +167,7 @@ function lcl-k8s-x-start {
 # stop all
 function lcl-k8s-x-stop {
   # start the cluster
-  "$g_DOCKER_KUBE_FOR_MAC_LOCATION"/hacks/v${g_DOCKER_KUBE_FOR_MAC_K8S_VERSION}/run lm-docker-kube-for-mac.sh stop
+  "$g_DOCKER_KUBE_FOR_MAC_LOCATION"/hacks/v${g_DOCKER_KUBE_FOR_MAC_K8S_VERSION}/run docker-kube-for-mac.sh stop
 }
 
 ########################################################################
