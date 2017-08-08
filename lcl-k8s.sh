@@ -3,8 +3,8 @@
 # Up/Down
 
 # get vars we need (permit overrides)
-g_DOCKER_KUBE_FOR_MAC_K8S_VERSION=${DOCKER_KUBE_FOR_MAC_K8S_VERSION:-1.7.1}
-g_DOCKER_KUBE_FOR_MAC_LOCATION=${DOCKER_KUBE_FOR_MAC_LOCATION:-${HOME}/proj/git/lmgitlab.hlsdev.local/hlsdev/docker-images/kube-for-mac}
+g_DOCKER_KUBE_FOR_MAC_K8S_VERSION=${DOCKER_KUBE_FOR_MAC_K8S_VERSION:-1.7.3}
+g_DOCKER_KUBE_FOR_MAC_LOCATION=${DOCKER_KUBE_FOR_MAC_LOCATION:-${HOME}/proj/git/src/lmgitlab.hlsdev.local/hlsdev/docker-images/kube-for-mac}
 g_DOCKER_KUBE_FOR_MAC_CONTEXT=${DOCKER_KUBE_FOR_MAC_CONTEXT:-kube-for-mac}
 #g_DOCKER_KUBE_FOR_MAC_GLOBAL_PV_NAME=${DOCKER_KUBE_FOR_MAC_GLOBAL_PV_NAME:-global-pv}
 #g_DOCKER_KUBE_FOR_MAC_GLOBAL_PV_LOCATION=${DOCKER_KUBE_FOR_MAC_GLOBAL_PV_LOCATION:-${HOME}/proj/work/local-k8s-global-pv}
