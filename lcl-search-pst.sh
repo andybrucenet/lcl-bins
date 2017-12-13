@@ -4,8 +4,10 @@
 # examples:
 #   ./lcl-search-pst.sh grepmail -q -i lm1771
 #   ./lcl-search-pst.sh -x 20170713-my-backup.7z grepmail -q -h 'Empty Host Compliance' | grep -e 'From: \|Date: '
-#
 # Use '-x' to pass in specific filenames. Otherwise all .7z files are scanned
+#
+# To rebuild from original transfer (7za):
+#   7z x [PST-FILE].001
 
 do_search_1() {
   local i_file="$1"; shift
