@@ -11,3 +11,8 @@ ping -c1 -t 3 192.168.98.100
 echo "ending"
 export PS1="tap interface>"
 dd of=/dev/null <&4 & # continuously reads from buffer and dumps to null
+sleep 5
+
+# bogon - add specific IP address
+ifconfig tap0 inet 192.168.98.100 netmask 255.255.255.0
+
