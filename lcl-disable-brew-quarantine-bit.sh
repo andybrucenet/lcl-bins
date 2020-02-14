@@ -1,17 +1,33 @@
 #!/bin/bash
 
+# save my path
+THE_PATH="$0"
+THE_CUR_USER="$(whoami)"
+
 # locate sed (latest brew installs only to gsed)
 the_sed=$(which gsed 2>/dev/null)
 [ x"$the_sed" = x ] && the_sed=$(which sed)
-echo "Using '$the_sed'"
+#echo "Using '$the_sed'"
 
 # locate the chef-user
 the_chef_user=$(ls -ld $(which brew) | awk '{print $3}')
-echo "Found the_chef_user='$the_chef_user'"
 
 # these are in here to allow this script to work directly in chef recipe
 fool_ruby_parser='\'
 fool_ruby_parser+='1'
+
+# are we the current chef user?
+if [ x"$the_chef_user" != x"$THE_CUR_USER" ] ; then
+  # run command as different user
+  echo "Enter password for '$the_chef_user' when prompted..."
+  the_rc=1
+  while [ $the_rc -ne 0 ] ; do
+    su $the_chef_user -c "$THE_PATH"
+    the_rc=$?
+    [ $the_rc -ne 0 ] && echo 'Try again...'
+  done
+	exit $the_rc
+fi
 
 # iterate over all installed casks
 for i in $(sudo -u $the_chef_user brew cask list) ; do
