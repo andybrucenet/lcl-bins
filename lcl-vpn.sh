@@ -1,5 +1,5 @@
 #!/bin/bash
-# lcl-start-vpn.sh
+# lcl-vpn.sh
 
 # vpn name
 the_vpn_name='vpn-lmil'
@@ -11,7 +11,7 @@ PING='/sbin/ping'
 # *internal functions*
 #
 # connect to the VPN
-function lcl-start-vpn-i-connect {
+function lcl-vpn-i-connect {
   /usr/bin/env osascript <<-EOF
 tell application "System Events"
   tell current location of network preferences
@@ -28,7 +28,7 @@ EOF
 }
 #
 # disconnect
-function lcl-start-vpn-i-disconnect {
+function lcl-vpn-i-disconnect {
   /usr/bin/env osascript <<-EOF
 tell application "System Events"
   tell current location of network preferences
@@ -44,7 +44,7 @@ EOF
 # external functions
 #
 # is vpn connected?
-function lcl-start-vpn-x-is-running {
+function lcl-vpn-x-is-running {
   # only run if we are online
   if ! $PING -c 1 google.com >/dev/null 2>&1 ; then
     echo 'Not online...ignoring'
@@ -59,7 +59,7 @@ function lcl-start-vpn-x-is-running {
   return 2
 }
 # connect to vpn
-function lcl-start-vpn-x-connect {
+function lcl-vpn-x-connect {
   # only run if we are online
   if ! $PING -c 1 google.com >/dev/null 2>&1 ; then
     echo 'Not online...ignoring'
@@ -74,11 +74,11 @@ function lcl-start-vpn-x-connect {
 
   # start it up
   echo 'Starting VPN...'
-  lcl-start-vpn-i-connect
+  lcl-vpn-i-connect
 }
 #
 # disconnect from vpn
-function lcl-start-vpn-x-disconnect {
+function lcl-vpn-x-disconnect {
   # do we already have VPN address?
   if ! ip a show ppp0 >/dev/null 2>&1 ; then
     echo 'VPN already down'
@@ -87,7 +87,7 @@ function lcl-start-vpn-x-disconnect {
 
   # shut it down
   echo 'Stopping VPN...'
-  lcl-start-vpn-i-disconnect
+  lcl-vpn-i-disconnect
 }
 
 ########################################################################
@@ -98,6 +98,6 @@ if [ "x$1" != "x" ]; then
 fi
 if [ $l_do_run -eq 1 ]; then
   l_func="$1"; shift
-  [ x"$l_func" != x ] && eval lcl-start-vpn-x-"$l_func" "$@"
+  [ x"$l_func" != x ] && eval lcl-vpn-x-"$l_func" "$@"
 fi
 
