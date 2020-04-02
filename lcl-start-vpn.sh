@@ -36,14 +36,18 @@ EOF
 
 
 # only run if we are online
-if ping -c 1 google.com >/dev/null 2>&1 ; then
-  # do we already have VPN address?
-  if ip a show ppp0 >/dev/null 2>&1 ; then
-    echo VPN is up
-    exit 0
-  fi
-
-  # start it up
-  vpn-connect
+if ! ping -c 1 google.com >/dev/null 2>&1 ; then
+  echo 'Not online...ignoring'
+  exit 1
 fi
+
+# do we already have VPN address?
+if ip a show ppp0 >/dev/null 2>&1 ; then
+  echo 'VPN is up'
+  exit 0
+fi
+
+# start it up
+cho 'Starting VPN...'
+vpn-connect
 
