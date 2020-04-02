@@ -1,0 +1,16 @@
+#!/usr/bin/env python
+
+from importlib import import_module
+
+# magic to check for a package and show version
+def check_version(module_name):
+    try:
+        the_module = import_module(module_name)
+        print('%s: %s' % (module_name, the_module.__version__))
+    except:
+        print('%s: **not installed**' % module_name)
+
+ml_modules = ['scipy', 'numpy', 'matplotlib', 'pandas', 'statsmodels', 'sklearn', 'theano', 'tensorflow', 'keras', 'h5py']
+for ml_module in ml_modules:
+    check_version(ml_module)
+
