@@ -1,1 +1,1 @@
-ffmpeg -i ~/Downloads/KillerJoe.mov -vcodec h264 -acodec mp2 ~/Downloads/KillerJoe.mov
+fbname=$(basename ${MY_FILE%.*}) ; ffmpeg -i $MY_FILE -vcodec h264 -acodec mp2 ~/Downloads/$fbname.mp4

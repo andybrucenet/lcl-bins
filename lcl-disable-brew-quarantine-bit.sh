@@ -54,7 +54,15 @@ for i in $(sudo -u $the_brew_user brew cask list) ; do
   if sudo -u $the_brew_user brew cask info $i 2>/dev/null | grep -ie '^==> Artifacts' >/dev/null 2>&1 ; then
     # *must* have an app
     the_app_name=$(sudo -u $the_brew_user brew cask info $i | grep -A10 -ie '^==> Artifacts' | grep -ie '(App)' | $the_sed -e "s/^\(.*\) \+(App)/$fool_ruby_parser/i")
-    [ x"$the_app_name" != x ] && the_app_path="/Applications/$the_app_name"
+    if echo "$the_app_name" | grep -e ' -> ' >/dev/null 2>&1 ; then
+      # link specified - extract
+      the_app_name=$(echo "$the_app_name" | awk -F' -> ' '{print $2}')
+      if echo "$the_app_name" | grep -e ')$' ; then
+        # some kind of parenthetical indicator
+        the_app_name=$(echo "$the_app_name" | sed -e 's/^\(.*\) ([A-Za-z]\+)$/\1/')
+      fi
+    fi
+    [ x"$the_app_name" != x ] && echo "$the_app_path" | grep -v '/' >/dev/null 2>&1 && the_app_path="/Applications/$the_app_name"
   fi
 
   # if no app lookup from install file
