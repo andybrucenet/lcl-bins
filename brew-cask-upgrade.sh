@@ -380,7 +380,7 @@ cask_show_updates_parallel () {
   #
   export -f cask_show_updates_parallel_inside
   #
-  parallel --will-cite -P "$NUMBER_OF_MAX_JOBS_ROUNDED" -k cask_show_updates_parallel_inside ::: "$(brew cask list)"
+  parallel --will-cite -P "$NUMBER_OF_MAX_JOBS_ROUNDED" -k cask_show_updates_parallel_inside ::: "$(brew list --cask)"
   wait
 
   echo "listing casks updates finished ;)"
@@ -415,7 +415,7 @@ cask-show-updates-one-by-one() {
   touch "$TMP_DIR_CASK"/"$DATE_LIST_FILE_CASK"
   touch "$TMP_DIR_CASK"/"$DATE_LIST_FILE_CASK_LATEST"
   touch "$TMP_DIR_CASK"/"$DATE_LIST_FILE_CASK_ALL"
-  brew cask list > "$DATE_LIST_FILE_CASK_ALL"
+  brew list --cask > "$DATE_LIST_FILE_CASK_ALL"
 
   for c in $(cat "$DATE_LIST_FILE_CASK_ALL") ; do
     local CASK_INFO=$(brew cask info $c)
