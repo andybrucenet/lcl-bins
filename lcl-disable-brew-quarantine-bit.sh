@@ -43,7 +43,7 @@ the_rc=$?
 # iterate over all installed casks
 echo ''
 echo '**Unquarantine brew applications...'
-for i in $(sudo -u $the_brew_user brew cask list) ; do
+for i in $(sudo -u $the_brew_user brew list --casks) ; do
   echo -n "Unquarantine $i: "
   the_app_path=''
   the_dir=$(find /usr/local/Caskroom -name $i -type d 2>/dev/null)
