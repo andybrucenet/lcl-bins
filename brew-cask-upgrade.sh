@@ -213,7 +213,7 @@ brew_show_updates_parallel() {
   #
   export -f brew_show_updates_parallel_inside
   #
-  parallel --will-cite -P "$NUMBER_OF_MAX_JOBS_ROUNDED" -k brew_show_updates_parallel_inside ::: "$(brew list)"
+  parallel --will-cite -P "$NUMBER_OF_MAX_JOBS_ROUNDED" -k brew_show_updates_parallel_inside ::: "$(brew list --formula)"
   wait
 
   echo "listing brew formulas updates finished ;)"
@@ -244,7 +244,7 @@ brew-show-updates-one-by-one() {
   DATE_LIST_FILE_BREW=$(echo "brew_update"_$(date +%Y-%m-%d_%H-%M-%S).txt)
   touch "$TMP_DIR_BREW"/"$DATE_LIST_FILE_BREW"
 
-  for item in $(brew list); do
+  for item in $(brew list --formula); do
     local BREW_INFO=$(brew info $item)
     #echo BREW_INFO is $BREW_INFO
     local BREW_NAME=$(echo "$BREW_INFO" | grep -e "$item: .*" | cut -d" " -f1 | sed 's/://g')
@@ -620,7 +620,7 @@ then
   # checking if all dependencies are installed
   echo ''
   echo "checking dependencies..."
-  if [[ $(brew list | grep jq) == '' ]] || [[ $(brew list | grep parallel) == '' ]]
+  if [[ $(brew list --formula | grep jq) == '' ]] || [[ $(brew list --formula | grep parallel) == '' ]]
   then
     echo "not all dependencies installed, installing..."
     ${USE_PASSWORD} | brew install jq parallel
