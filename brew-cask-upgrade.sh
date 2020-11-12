@@ -144,11 +144,11 @@ cleanup-all() {
   echo 'cleaning finished ;)'
 }
 
-# upgrading all homebrew formulas
+# upgrading all homebrew formulae
 brew_show_updates_parallel() {
   # always use _ instead of - because some sh commands called by parallel would give errors
 
-  echo "listing brew formulas updates..."
+  echo "listing brew formulae updates..."
 
   printf '=%.0s' {1..80}
   printf '\n'
@@ -179,12 +179,13 @@ brew_show_updates_parallel() {
   brew_show_updates_parallel_inside() {
     # always use _ instead of - because some sh commands called by parallel would give errors
     local item="$1"
-    local BREW_INFO=$(brew info $item)
+		# ABr: as of 20201112 'brew info' gives spurious warning if cask is available
+    local BREW_INFO=$(brew info $item 2>/dev/null)
     #echo BREW_INFO is $BREW_INFO
     local BREW_NAME=$(echo "$BREW_INFO" | grep -e "$item: .*" | cut -d" " -f1 | sed 's/://g')
     #echo BREW_NAME is $BREW_NAME
     # make sure you have jq installed via brew
-    local BREW_REVISION=$(brew info "$item" --json=v1 | jq -r '.[]|.revision')
+    local BREW_REVISION=$(brew info "$item" --json=v1 2>/dev/null | jq -r '.[]|.revision')
     #echo BREW_REVISION is $BREW_REVISION
     if [[ "$BREW_REVISION" == "0" ]]
     then
@@ -216,75 +217,16 @@ brew_show_updates_parallel() {
   parallel --will-cite -P "$NUMBER_OF_MAX_JOBS_ROUNDED" -k brew_show_updates_parallel_inside ::: "$(brew list --formula)"
   wait
 
-  echo "listing brew formulas updates finished ;)"
+  echo "listing brew formulae updates finished ;)"
 }
 
-brew-show-updates-one-by-one() {
-  echo "listing brew formulas updates..."
-
-  printf '=%.0s' {1..80}
-  printf '\n'
-  printf "%-35s | %-20s | %-5s\n" "BREW NAME" "LATEST VERSION" "LATEST INSTALLED"
-  printf '=%.0s' {1..80}
-  printf '\n'
-
-  TMP_DIR_BREW=/tmp/brew_updates
-  if [ -e "$TMP_DIR_BREW" ]
-  then
-    if [ "$(ls -A $TMP_DIR_BREW/)" ]
-    then
-      rm "$TMP_DIR_BREW"/*
-    else
-      :
-    fi
-  else
-    :
-  fi
-  mkdir -p "$TMP_DIR_BREW"/
-  DATE_LIST_FILE_BREW=$(echo "brew_update"_$(date +%Y-%m-%d_%H-%M-%S).txt)
-  touch "$TMP_DIR_BREW"/"$DATE_LIST_FILE_BREW"
-
-  for item in $(brew list --formula); do
-    local BREW_INFO=$(brew info $item)
-    #echo BREW_INFO is $BREW_INFO
-    local BREW_NAME=$(echo "$BREW_INFO" | grep -e "$item: .*" | cut -d" " -f1 | sed 's/://g')
-    #echo BREW_NAME is $BREW_NAME
-    # make sure you have jq installed via brew
-    local BREW_REVISION=$(brew info "$item" --json=v1 | jq . | grep revision | grep -o '[0-9]')
-    #echo BREW_REVISION is $BREW_REVISION
-    if [[ "$BREW_REVISION" == "0" ]]
-    then
-      local NEW_VERSION=$(echo "$BREW_INFO" | grep -e "$item: .*" | cut -d" " -f3 | sed 's/,//g')
-    else
-      local NEW_VERSION=$(echo $(echo "$BREW_INFO" | grep -e "$item: .*" | cut -d" " -f3 | sed 's/,//g')_"$BREW_REVISION")
-    fi
-    #echo NEW_VERSION is $NEW_VERSION
-    local IS_CURRENT_VERSION_INSTALLED=$(echo $BREW_INFO | grep -q ".*/Cellar/$item/$NEW_VERSION\s.*" 2>&1 && echo -e '\033[1;32mtrue\033[0m' || echo -e '\033[1;31mfalse\033[0m' )
-    #echo IS_CURRENT_VERSION_INSTALLED is $IS_CURRENT_VERSION_INSTALLED
-    printf "%-35s | %-20s | %-15s\n" "$item" "$NEW_VERSION" "$IS_CURRENT_VERSION_INSTALLED"
-
-    # installing if not up-to-date and not excluded
-    if [[ "$IS_CURRENT_VERSION_INSTALLED" == "$(echo -e '\033[1;31mfalse\033[0m')" ]] && [[ ${CASK_EXCLUDES} != *"$BREW_NAME"* ]]
-    then
-      echo "$BREW_NAME" >> "$TMP_DIR_BREW"/"$DATE_LIST_FILE_BREW"
-    fi
-
-    BREW_INFO=""
-    NEW_VERSION=""
-    IS_CURRENT_VERSION_INSTALLED=""
-  done
-
-  echo "listing brew formulas updates finished ;)"
-}
-
-
-brew-install-updates() {
-  echo "installing brew formulas updates..."
+formula-install-updates() {
+  echo "installing brew formulae updates..."
 
   while IFS='' read -r line || [[ -n "$line" ]]
   do
     echo 'updating '"$line"'...'
-    ${USE_PASSWORD} | brew upgrade "$line"
+    ${USE_PASSWORD} | brew upgrade --formula "$line"
     echo 'removing old installed versions of '"$line"'...'
     ${USE_PASSWORD} | brew cleanup "$line"
     echo ''
@@ -292,21 +234,10 @@ brew-install-updates() {
 
   if [[ $(cat "$TMP_DIR_BREW"/"$DATE_LIST_FILE_BREW") == "" ]]
   then
-    echo "no brew formula updates available..."
+    echo "no brew formulae updates available..."
   else
-    echo "installing brew formulas updates finished ;)"
+    echo "installing brew formulae updates finished ;)"
   fi
-
-  # ABr: ffmpeg no longer supports options
-  # ABr: see https://gist.github.com/clayton/6196167 but none of the solutions work
-  ## special ffmpeg
-  #if [[ $(cat "$TMP_DIR_BREW"/"$DATE_LIST_FILE_BREW" | grep "fdk-aac") != "" ]] || [[ $(cat "$TMP_DIR_BREW"/"$DATE_LIST_FILE_BREW" | grep "sdl2") != "" ]] || [[ $(cat "$TMP_DIR_BREW"/"$DATE_LIST_FILE_BREW" | grep "freetype") != "" ]] || [[ $(cat "$TMP_DIR_BREW"/"$DATE_LIST_FILE_BREW" | grep "libass") != "" ]] || [[ $(cat "$TMP_DIR_BREW"/"$DATE_LIST_FILE_BREW" | grep "libvorbis") != "" ]] || [[ $(cat "$TMP_DIR_BREW"/"$DATE_LIST_FILE_BREW" | grep "libvpx") != "" ]] || [[ $(cat "$TMP_DIR_BREW"/"$DATE_LIST_FILE_BREW" | grep "opus") != "" ]] || [[ $(cat "$TMP_DIR_BREW"/"$DATE_LIST_FILE_BREW" | grep "x265") != "" ]]
-  #then
-    #echo "rebuilding ffmpeg due to components updates..."
-    #${USE_PASSWORD} | brew reinstall ffmpeg --with-sdl2 --with-freetype --with-libass --with-libvorbis --with-libvpx --with-opus --with-x265
-  #else
-    #:
-  #fi
 }
 
 # selectively upgrade casks
@@ -387,71 +318,6 @@ cask_show_updates_parallel () {
 
 }
 
-cask-show-updates-one-by-one() {
-  echo "listing casks updates..."
-
-  printf '=%.0s' {1..80}
-  printf '\n'
-  printf "%-35s | %-20s | %-5s\n" "CASK NAME" "LATEST VERSION" "LATEST INSTALLED"
-  printf '=%.0s' {1..80}
-  printf '\n'
-
-  TMP_DIR_CASK=/tmp/cask_updates
-  if [ -e "$TMP_DIR_CASK" ]
-  then
-    if [ "$(ls -A $TMP_DIR_CASK/)" ]
-    then
-      rm "$TMP_DIR_CASK"/*
-    else
-      :
-    fi
-  else
-    :
-  fi
-  mkdir -p "$TMP_DIR_CASK"/
-  DATE_LIST_FILE_CASK=$(echo "casks_update"_$(date +%Y-%m-%d_%H-%M-%S).txt)
-  DATE_LIST_FILE_CASK_LATEST=$(echo "casks_update_latest"_$(date +%Y-%m-%d_%H-%M-%S).txt)
-  DATE_LIST_FILE_CASK_ALL=$(echo "casks_update_all"_$(date +%Y-%m-%d_%H-%M-%S).txt)
-  touch "$TMP_DIR_CASK"/"$DATE_LIST_FILE_CASK"
-  touch "$TMP_DIR_CASK"/"$DATE_LIST_FILE_CASK_LATEST"
-  touch "$TMP_DIR_CASK"/"$DATE_LIST_FILE_CASK_ALL"
-  brew list --cask > "$DATE_LIST_FILE_CASK_ALL"
-
-  for c in $(cat "$DATE_LIST_FILE_CASK_ALL") ; do
-    local CASK_INFO=$(brew cask info $c)
-    local CASK_NAME=$(echo "$c" | cut -d ":" -f1 | xargs)
-    #if [[ $(brew cask info $c | tail -1 | grep "(app)") != "" ]]
-    #then
-    #  APPNAME=$(brew cask info $c | tail -1 | awk '{$(NF--)=""; print}' | sed 's/ *$//')
-    #else
-    #  APPNAME=$(echo $(brew cask info $c | grep -A 1 "==> Name" | tail -1).app)
-    #fi
-    #local INSTALLED_VERSION=$(plutil -p "/Applications/$APPNAME/Contents/Info.plist" | grep "CFBundleShortVersionString" | awk '{print $NF}' | sed 's/"//g')
-    local NEW_VERSION=$(echo "$CASK_INFO" | grep -e "$CASK_NAME: .*" | cut -d ":" -f2 | sed 's/ *//' )
-    local IS_CURRENT_VERSION_INSTALLED=$(echo $CASK_INFO | grep -q ".*/Caskroom/$CASK_NAME/$NEW_VERSION.*" 2>&1 && echo -e '\033[1;32mtrue\033[0m' || echo -e '\033[1;31mfalse\033[0m')
-
-    printf "%-35s | %-20s | %-15s\n" "$CASK_NAME" "$NEW_VERSION" "$IS_CURRENT_VERSION_INSTALLED"
-
-    # installing if not up-to-date and not excluded
-    if [[ "$IS_CURRENT_VERSION_INSTALLED" == "$(echo -e '\033[1;31mfalse\033[0m')" ]] && [[ ${CASK_EXCLUDES} != *"$CASK_NAME"* ]]
-    then
-      echo "$CASK_NAME" >> "$TMP_DIR_CASK"/"$DATE_LIST_FILE_CASK"
-    fi
-
-    if [[ "$NEW_VERSION" == "latest" ]] && [[ ${CASK_EXCLUDES} != *"$CASK_NAME"* ]]
-    then
-      echo "$CASK_NAME" >> "$TMP_DIR_CASK"/"$DATE_LIST_FILE_CASK_LATEST"
-    fi
-
-    CASK_INFO=""
-    NEW_VERSION=""
-    IS_CURRENT_VERSION_INSTALLED=""
-  done
-  rm -f "$DATE_LIST_FILE_CASK_ALL"
-
-  echo "listing casks updates finished ;)"
-}
-
 cask-do-update() {
   local i_mode="$1" ; shift
   local i_cask="$1" ; shift
@@ -486,11 +352,11 @@ cask-do-update() {
   l_update_rc=0
   sudo -v
   if [ x"$i_mode" = x'update' ] ; then
-    ${USE_PASSWORD} | brew reinstall "$line" --force
+    ${USE_PASSWORD} | brew reinstall --cask "$line" --force
     l_update_rc=$?
   else
     ${USE_PASSWORD} | brew cask uninstall "$line" --force
-    ${USE_PASSWORD} | brew cask install "$line" --force
+    ${USE_PASSWORD} | brew install --cask "$line" --force
     l_update_rc=$?
   fi
   sudo -k
@@ -501,7 +367,7 @@ cask-do-update() {
     for l_dependent_cask in $l_dependent_casks ; do
       echo -n "  dependent package [$l_dependent_cask]..."
       sudo -v
-      ${USE_PASSWORD} | brew cask install "$l_dependent_cask"
+      ${USE_PASSWORD} | brew install --cask "$l_dependent_cask"
       sudo -k
       echo ''
     done
@@ -545,7 +411,7 @@ cask-install-updates() {
 ###
 
 echo ''
-echo "updating homebrew, formulas and casks..."
+echo "updating homebrew, formulae and casks..."
 
 echo ''
 
@@ -623,7 +489,7 @@ then
   if [[ $(brew list --formula | grep jq) == '' ]] || [[ $(brew list --formula | grep parallel) == '' ]]
   then
     echo "not all dependencies installed, installing..."
-    ${USE_PASSWORD} | brew install jq parallel
+    ${USE_PASSWORD} | brew install --formula jq parallel
   else
     echo "all dependencies installed..."
   fi
@@ -643,10 +509,8 @@ then
   homebrew-update
   echo ''
   brew_show_updates_parallel
-  #brew-show-updates-one-by-one
   echo ''
   cask_show_updates_parallel
-  #cask-show-updates-one-by-one
 
   # handle input
   l_do_continue=0
@@ -659,7 +523,7 @@ then
     [ x"$DO_CONTINUE" = x ] && l_do_continue=1
   fi
   if [ $l_do_continue -eq 1 ]; then
-    brew-install-updates
+    formula-install-updates
     echo ''
     cask-install-updates
   fi
