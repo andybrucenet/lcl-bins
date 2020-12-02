@@ -276,7 +276,7 @@ cask_show_updates_parallel () {
   cask_show_updates_parallel_inside() {
     # always use _ instead of - because some sh commands called by parallel would give errors
     local c="$1"
-    local CASK_INFO=$(brew cask info $c)
+    local CASK_INFO=$(brew info --cask $c)
     local CASK_NAME=$(echo "$c" | cut -d ":" -f1 | xargs)
     #if [[ $(brew cask info $c | tail -1 | grep "(app)") != "" ]]
     #then
@@ -335,7 +335,7 @@ cask-do-update() {
   # handle dependencies
   local l_dependent_casks=''
   if [ x"$i_cask" = x'virtualbox' ] ; then
-    if brew cask info virtualbox-extension-pack >/dev/null 2>&1 ; then
+    if brew info --cask virtualbox-extension-pack >/dev/null 2>&1 ; then
       l_dependent_casks='virtualbox-extension-pack'
     fi
   fi
