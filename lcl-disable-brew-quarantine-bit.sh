@@ -51,9 +51,9 @@ for i in $(sudo -u $the_brew_user brew list --casks) ; do
   [ x"$the_dir" = x ] && echo 'empty the_dir' && continue
 
   # are there artifacts available?
-  if sudo -u $the_brew_user brew cask info $i 2>/dev/null | grep -ie '^==> Artifacts' >/dev/null 2>&1 ; then
+  if sudo -u $the_brew_user brew info --cask $i 2>/dev/null | grep -ie '^==> Artifacts' >/dev/null 2>&1 ; then
     # *must* have an app
-    the_app_name=$(sudo -u $the_brew_user brew cask info $i | grep -A10 -ie '^==> Artifacts' | grep -ie '(App)' | $the_sed -e "s/^\(.*\) \+(App)/$fool_ruby_parser/i")
+    the_app_name=$(sudo -u $the_brew_user brew info --cask $i | grep -A10 -ie '^==> Artifacts' | grep -ie '(App)' | $the_sed -e "s/^\(.*\) \+(App)/$fool_ruby_parser/i")
     if echo "$the_app_name" | grep -e ' -> ' >/dev/null 2>&1 ; then
       # link specified - extract
       the_app_name=$(echo "$the_app_name" | awk -F' -> ' '{print $2}')
@@ -68,8 +68,8 @@ for i in $(sudo -u $the_brew_user brew list --casks) ; do
   # if no app lookup from install file
   if [ x"$the_app_path" = x ] ; then
     # get the install file first
-    the_installer_file=$(sudo -u $the_brew_user brew cask info $i | grep -ie '^from: ' | $the_sed -e "s/^from: \+\(.*\)/$fool_ruby_parser/i; s/^.*\/\([^\/]\+\)\$/$fool_ruby_parser/" | head -n 1)
-    l_rc=$? ; [ $l_rc -ne 0 ] && echo "brew cask info fail with $l_rc" && continue
+    the_installer_file=$(sudo -u $the_brew_user brew info --cask $i | grep -ie '^from: ' | $the_sed -e "s/^from: \+\(.*\)/$fool_ruby_parser/i; s/^.*\/\([^\/]\+\)\$/$fool_ruby_parser/" | head -n 1)
+    l_rc=$? ; [ $l_rc -ne 0 ] && echo "brew info --cask fail with $l_rc" && continue
     [ x"$the_installer_file" = x ] && echo 'empty the_installer_file' && continue
 
     # where is it in brew?
