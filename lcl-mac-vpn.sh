@@ -1,5 +1,5 @@
 #!/bin/bash
-# lcl-vpn.sh
+# lcl-vpn.sh, ABr
 
 # ping location
 PING='/sbin/ping'
