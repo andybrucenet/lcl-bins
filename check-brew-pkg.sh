@@ -9,11 +9,11 @@ for i in $* ; do
   #set -x
   l_found_items=$(brew search 2>/dev/null | grep -i -e "^$l_the_value\$")
   for j in $l_found_items ; do
-    echo "brew install $j"
+    echo "brew install --formula $j"
   done
   l_found_items=$(brew search --casks 2>/dev/null | grep -i -e "^$l_the_value\$")
   for j in $l_found_items ; do
-    echo "brew cask install $j"
+    echo "brew install --cask $j"
   done
 done
 
