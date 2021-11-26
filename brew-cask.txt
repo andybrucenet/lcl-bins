@@ -1,5 +1,6 @@
 adobe-acrobat-reader
 azure-data-studio
+brackets
 caffeine
 docker
 drawio
@@ -26,4 +27,5 @@ virtualbox
 virtualbox-extension-pack
 visual-studio-code
 vlc
+vysor
 wkhtmltopdf
