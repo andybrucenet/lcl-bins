@@ -29,6 +29,7 @@ giflib
 glib
 glog
 gmp
+gnu-sed
 gnutls
 go
 gobject-introspection

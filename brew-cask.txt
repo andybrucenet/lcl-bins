@@ -6,6 +6,7 @@ drawio
 dropbox
 firefox
 gimp
+git-credential-manager-core
 google-chrome
 idrive
 iterm2

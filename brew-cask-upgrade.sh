@@ -179,7 +179,7 @@ brew_show_updates_parallel() {
   brew_show_updates_parallel_inside() {
     # always use _ instead of - because some sh commands called by parallel would give errors
     local item="$1"
-		# ABr: as of 20201112 'brew info' gives spurious warning if cask is available
+    # ABr: as of 20201112 'brew info' gives spurious warning if cask is available
     local BREW_INFO=$(brew info $item 2>/dev/null)
     #echo BREW_INFO is $BREW_INFO
     local BREW_NAME=$(echo "$BREW_INFO" | grep -e "$item: .*" | cut -d" " -f1 | sed 's/://g')
@@ -278,13 +278,6 @@ cask_show_updates_parallel () {
     local c="$1"
     local CASK_INFO=$(brew info --cask $c)
     local CASK_NAME=$(echo "$c" | cut -d ":" -f1 | xargs)
-    #if [[ $(brew cask info $c | tail -1 | grep "(app)") != "" ]]
-    #then
-    #  APPNAME=$(brew cask info $c | tail -1 | awk '{$(NF--)=""; print}' | sed 's/ *$//')
-    #else
-    #  APPNAME=$(echo $(brew cask info $c | grep -A 1 "==> Name" | tail -1).app)
-    #fi
-    #local INSTALLED_VERSION=$(plutil -p "/Applications/$APPNAME/Contents/Info.plist" | grep "CFBundleShortVersionString" | awk '{print $NF}' | sed 's/"//g')
     local NEW_VERSION=$(echo "$CASK_INFO" | grep -e "$CASK_NAME: .*" | cut -d ":" -f2 | sed 's/(auto_updates)//' | sed 's/ *//g')
     local IS_CURRENT_VERSION_INSTALLED=$(echo $CASK_INFO | grep -q ".*/Caskroom/$CASK_NAME/$NEW_VERSION.*" 2>&1 && echo -e '\033[1;32mtrue\033[0m' || echo -e '\033[1;31mfalse\033[0m')
 
@@ -344,7 +337,7 @@ cask-do-update() {
   echo -n "$i_mode $i_cask..."
   for l_dependent_cask in $l_dependent_casks ; do
     echo -n "[$l_dependent_cask] "
-    ${USE_PASSWORD} | brew cask uninstall "$l_dependent_cask" --force
+    ${USE_PASSWORD} | brew uninstall --cask "$l_dependent_cask" --force
   done
   echo ''
 
@@ -355,7 +348,7 @@ cask-do-update() {
     ${USE_PASSWORD} | brew reinstall --cask "$line" --force
     l_update_rc=$?
   else
-    ${USE_PASSWORD} | brew cask uninstall "$line" --force
+    ${USE_PASSWORD} | brew uninstall --cask "$line" --force
     ${USE_PASSWORD} | brew install --cask "$line" --force
     l_update_rc=$?
   fi
