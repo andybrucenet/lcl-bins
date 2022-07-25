@@ -278,6 +278,13 @@ cask_show_updates_parallel () {
     local c="$1"
     local CASK_INFO=$(brew info --cask $c)
     local CASK_NAME=$(echo "$c" | cut -d ":" -f1 | xargs)
+    #if [[ $(brew cask info $c | tail -1 | grep "(app)") != "" ]]
+    #then
+    #  APPNAME=$(brew cask info $c | tail -1 | awk '{$(NF--)=""; print}' | sed 's/ *$//')
+    #else
+    #  APPNAME=$(echo $(brew cask info $c | grep -A 1 "==> Name" | tail -1).app)
+    #fi
+    #local INSTALLED_VERSION=$(plutil -p "/Applications/$APPNAME/Contents/Info.plist" | grep "CFBundleShortVersionString" | awk '{print $NF}' | sed 's/"//g')
     local NEW_VERSION=$(echo "$CASK_INFO" | grep -e "$CASK_NAME: .*" | cut -d ":" -f2 | sed 's/(auto_updates)//' | sed 's/ *//g')
     local IS_CURRENT_VERSION_INSTALLED=$(echo $CASK_INFO | grep -q ".*/Caskroom/$CASK_NAME/$NEW_VERSION.*" 2>&1 && echo -e '\033[1;32mtrue\033[0m' || echo -e '\033[1;31mfalse\033[0m')
 
