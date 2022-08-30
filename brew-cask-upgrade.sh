@@ -1,10 +1,11 @@
 #!/bin/bash
+# Maintained by ABr, https://github.com/andybrucenet/lcl-bins/blob/master/brew-cask-upgrade.sh
+# Updated for Monterey, 12.5.1
 
 # http://brew.sh
 # http://braumeister.org
 # http://caskroom.io
 # http://caskroom.io/search
-
 
 ### assume no password needed - override to get SUDO password
 needs_sudo_password=${BREW_CASK_UPGRADE_NEEDS_SUDO_PASSWORD:-0}
@@ -182,16 +183,16 @@ brew_show_updates_parallel() {
     # ABr: as of 20201112 'brew info' gives spurious warning if cask is available
     local BREW_INFO=$(brew info $item 2>/dev/null)
     #echo BREW_INFO is $BREW_INFO
-    local BREW_NAME=$(echo "$BREW_INFO" | grep -e "$item: .*" | cut -d" " -f1 | sed 's/://g')
+    local BREW_NAME=$(echo "$BREW_INFO" | grep -e "$item: .*" | sed -e 's/^[^0-9A-Za-z]*//' | cut -d" " -f1 | sed 's/://g')
     #echo BREW_NAME is $BREW_NAME
     # make sure you have jq installed via brew
     local BREW_REVISION=$(brew info "$item" --json=v1 2>/dev/null | jq -r '.[]|.revision')
     #echo BREW_REVISION is $BREW_REVISION
     if [[ "$BREW_REVISION" == "0" ]]
     then
-      local NEW_VERSION=$(echo "$BREW_INFO" | grep -e "$item: .*" | cut -d" " -f3 | sed 's/,//g')
+      local NEW_VERSION=$(echo "$BREW_INFO" | grep -e "$item: .*" | sed -e 's/^[^0-9A-Za-z]*//' | cut -d" " -f3 | sed 's/,//g')
     else
-      local NEW_VERSION=$(echo $(echo "$BREW_INFO" | grep -e "$item: .*" | cut -d" " -f3 | sed 's/,//g')_"$BREW_REVISION")
+      local NEW_VERSION=$(echo $(echo "$BREW_INFO" | grep -e "$item: .*" | sed -e 's/^[^0-9A-Za-z]*//' | cut -d" " -f3 | sed 's/,//g')_"$BREW_REVISION")
     fi
     #echo NEW_VERSION is $NEW_VERSION
     local IS_CURRENT_VERSION_INSTALLED=$(echo $BREW_INFO | grep -q ".*/Cellar/$item/$NEW_VERSION\s.*" 2>&1 && echo -e '\033[1;32mtrue\033[0m' || echo -e '\033[1;31mfalse\033[0m' )
@@ -560,4 +561,3 @@ unset_variables
 #kill -9 -$(ps -o pgid= $$ | grep -o '[0-9]*')
 
 exit
-
