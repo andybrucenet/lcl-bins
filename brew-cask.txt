@@ -1,4 +1,5 @@
 adobe-acrobat-reader
+android-studio
 azure-data-studio
 brackets
 caffeine
@@ -6,14 +7,14 @@ docker
 drawio
 dropbox
 firefox
+flutter
 gimp
-git-credential-manager-core
 google-chrome
 idrive
 iterm2
 libreoffice
 macvim
-microsoft-teams
+microsoft-remote-desktop
 obs
 onedrive
 oracle-jdk
