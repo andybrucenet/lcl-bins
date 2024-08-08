@@ -44,6 +44,7 @@ the_rc=$?
 echo ''
 echo '**Unquarantine brew applications...'
 for i in $(sudo -u $the_brew_user brew list --casks) ; do
+  #set -x
   echo -n "Unquarantine $i: "
   the_app_paths=''
   the_app_path=''
