@@ -24,7 +24,8 @@ if [ x"$the_brew_user" != x"$THE_CUR_USER" ] ; then
   echo "**Enter password for '$the_brew_user' when prompted:"
   the_rc=1
   while [ $the_rc -ne 0 ] ; do
-    su $the_brew_user -c "$THE_PATH"
+    #echo "su $the_brew_user -c \"$THE_PATH '$1'\""
+    su $the_brew_user -c "$THE_PATH '$1'"
     the_rc=$?
     [ $the_rc -ne 0 ] && echo 'Try again...'
   done
@@ -46,6 +47,12 @@ echo '**Unquarantine brew applications...'
 for i in $(sudo -u $the_brew_user brew list --casks) ; do
   #set -x
   echo -n "Unquarantine $i: "
+  if [ x"$1" != x ] ; then
+    if ! echo "$i" | grep -e "$1" >/dev/null 2>&1 ; then
+      echo 'IGNORED'
+      continue
+    fi
+  fi
   the_app_paths=''
   the_app_path=''
   the_dir=$(find /usr/local/Caskroom -name $i -type d 2>/dev/null)
