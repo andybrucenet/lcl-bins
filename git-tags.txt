@@ -1,0 +1,8 @@
+# force new tag (local)
+git tag -f v0_1_2_8
+
+# reset tag on origin (remote)
+git push origin :refs/tags/v0_1_2_8
+
+# push tag to origin (remote)
+git push origin v0_1_2_8
